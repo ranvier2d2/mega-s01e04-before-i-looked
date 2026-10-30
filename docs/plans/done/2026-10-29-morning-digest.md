@@ -1,8 +1,9 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
+closed: 2026-10-30
 ---
 
 # Morning digest
@@ -77,3 +78,21 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| # | Issue | Blocked by | Worker | Closed |
+|---|-------|-----------|--------|--------|
+| 1 | Digest types | — | pixir · gpt-6.1-sol · medium | 2026-10-30 |
+| 2 | Run log reader | #1 | pixir · gpt-6.1-sol · medium | 2026-10-30 |
+| 3 | Digest page | #2 | pixir · gpt-6.1-sol · medium | 2026-10-30 |
+| 4 | Digest JSON | #3 | pixir · gpt-6.1-sol · medium | 2026-10-30 |
+| 5 | Board link | #3 | pixir · gpt-6.1-sol · medium | 2026-10-30 |
+| 6 | Route tests | #3, #4 | pixir · gpt-6.1-sol · medium | 2026-10-30 |
+| 7 | Preview for review | #3 | pixir · gpt-6.1-sol · medium (save); claude-code · claude-opus-5-5 · high (upload) | 2026-10-30 |
+| 8 | Clean up | #7 | claude-code · claude-opus-5-5 · high | 2026-10-30 |
+
+Every issue was reviewed by claude-code · claude-opus-5-5 · high, which reran its proof in a clean sandbox.
+#6 failed its first review (the night check could be removed without a test failing); f5edd62 fixed it.
+#7 was closed before the review and reopened until the reviewer had looked.
+The first, marked upload was deleted from the host after the clean copy went up over the same link.
