@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { loadConfig, type RigConfig } from './config.js';
 import { lane } from './lane.js';
-import { readNight } from './digest/read.js';
+import { readDigest } from './digest/night.js';
 import { Digest } from './views/digest.js';
 import { readStatus } from './status.js';
 import { Layout } from './views/layout.js';
@@ -22,9 +22,7 @@ export function createApp(config: RigConfig = loadConfig()) {
 
   app.get('/digest/:night', (c) => {
     const night = c.req.param('night');
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(night)) return c.notFound();
-
-    const digest = readNight(config.runsDir, night);
+    const digest = readDigest(config.runsDir, night);
     if (digest === null) return c.notFound();
 
     return c.html(
@@ -32,6 +30,14 @@ export function createApp(config: RigConfig = loadConfig()) {
         <Digest night={night} digest={digest} />
       </Layout>,
     );
+  });
+
+  app.get('/api/digest/:night', (c) => {
+    const night = c.req.param('night');
+    const digest = readDigest(config.runsDir, night);
+    if (digest === null) return c.json({ error: 'not found' }, 404);
+
+    return c.json({ night, ...digest });
   });
 
   return app;
