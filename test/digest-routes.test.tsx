@@ -1,5 +1,6 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
 import { readNight } from '../src/digest/read.js';
@@ -16,8 +17,10 @@ const badNight = [
 ].join('\n');
 
 beforeAll(() => {
-  mkdirSync('var', { recursive: true });
-  runsDir = mkdtempSync(join('var', 'test-runs-'));
+  const varDir = fileURLToPath(new URL('../var/', import.meta.url));
+  mkdirSync(varDir, { recursive: true });
+  runsDir = mkdtempSync(join(varDir, 'test-runs-'));
+  writeFileSync(join(runsDir, 'latest.jsonl'), normalNight.split('\n')[0]);
   writeFileSync(join(runsDir, '2026-10-28.jsonl'), normalNight);
   writeFileSync(join(runsDir, '2026-10-29.jsonl'), '');
   writeFileSync(join(runsDir, '2026-10-30.jsonl'), badNight);
@@ -62,8 +65,8 @@ describe('digest page routes', () => {
     expect(await res.text()).toBe('404 Not Found');
   });
 
-  it('returns 404 for a malformed night', async () => {
-    const res = await app().request('/digest/..%2Fpackage');
+  it('returns 404 for a non-date night even when its file exists', async () => {
+    const res = await app().request('/digest/latest');
     expect(res.status).toBe(404);
     expect(await res.text()).toBe('404 Not Found');
   });
@@ -110,8 +113,8 @@ describe('digest JSON routes', () => {
     expect(await res.json()).toEqual({ error: 'not found' });
   });
 
-  it('returns JSON 404 for a malformed night', async () => {
-    const res = await app().request('/api/digest/..%2Fpackage');
+  it('returns JSON 404 for a non-date night even when its file exists', async () => {
+    const res = await app().request('/api/digest/latest');
     expect(res.status).toBe(404);
     expect(await res.json()).toEqual({ error: 'not found' });
   });
@@ -121,7 +124,6 @@ describe('digest JSON routes', () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({
       night: '2026-10-29',
-      ...readNight(runsDir, '2026-10-29'),
       rows: [],
       badLines: 0,
       counts: { ok: 0, retry: 0, fail: 0 },
